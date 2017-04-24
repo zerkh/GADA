@@ -31,7 +31,7 @@ def read_wordvec(path):
 
 	return d_word_idx, d_idx_word, l_wordvec
 
-def read_sentence(path, d_word_idx, d_idx_word, maxlen=100):
+def read_sentence(path, d_word_idx, d_idx_word, maxlen=200):
 	fin = open(path)
 	UNK_idx = d_word_idx["<UNK>"]
 	PAD_idx = d_word_idx["<PAD>"]
@@ -46,11 +46,11 @@ def read_sentence(path, d_word_idx, d_idx_word, maxlen=100):
 			else:
 				l_idxs.append(UNK_idx)
 
-		if len(l_idxs)>maxlen:
-			maxlen = len(l_idxs)
 		l_sentence.append(l_idxs)
 
 	for i in xrange(len(l_sentence)):
+		if len(l_sentence[i]) > maxlen:
+			l_sentence[i] = l_sentence[i][:maxlen]
 		for _ in range(len(l_sentence[i]), maxlen):
 			l_sentence[i].append(PAD_idx)
 
@@ -58,4 +58,4 @@ def read_sentence(path, d_word_idx, d_idx_word, maxlen=100):
 
 if __name__ == "__main__":
 	d_word_idx, d_idx_word, l_wordvec = read_wordvec("/home/kh/amazon_review/experiment/wordvec/all_reviews.txt.dim25")
-	read_sentence("/home/kh/amazon_review/experiment/lem_data/apparel/all.review", d_word_idx, d_idx_word)
+	l_sentence = read_sentence("/home/kh/amazon_review/experiment/lem_data/apparel/all.review", d_word_idx, d_idx_word)
