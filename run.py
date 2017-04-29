@@ -43,7 +43,7 @@ def partial_train(sess, model, dev_model, train_data, dev_data, word_emb):
 				_x, _y = get_batch(train_data[slice]["sentiment"], FLAGS.batch_size)
 				sess.run(model.c_opt, feed_dict={model.x:_x, model.y_s:_y})
 				
-			if epoch%100:
+			if epoch%100 == 0:
 				acc = test(sess, dev_data, dev_model)
 				print "slice %d epoch %d: %g" %(slice, epoch, acc)
 				
@@ -57,7 +57,7 @@ def test(sess, test_data, model=None):
 	
 	true_num = 0
 	for term in test_data:
-		logits_c = sess.run(model.logits_c, feed_dict={})
+		logits_c = sess.run(model.logits_c, feed_dict={model.x:[term[0]]})
 		pred_label = 0 if logits_c[0]>logits_c[1] else 1
 		if pred_label == term[1]:
 			true_num += 1

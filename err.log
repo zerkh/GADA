@@ -1,0 +1,16 @@
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+Traceback (most recent call last):
+  File "run.py", line 116, in <module>
+    tf.app.run()
+  File "/home/kh/anaconda2/lib/python2.7/site-packages/tensorflow/python/platform/app.py", line 44, in run
+    _sys.exit(main(_sys.argv[:1] + flags_passthrough))
+  File "run.py", line 72, in main
+    FLAGS.target_dir, FLAGS.maxlen)
+  File "/home/kh/amazon_review/experiment/code/GADA/reader.py", line 68, in get_data
+    src_all_sent = read_sentence(source_dir+"all.review", d_word_idx, d_idx_word, maxlen)
+  File "/home/kh/amazon_review/experiment/code/GADA/reader.py", line 45, in read_sentence
+    l_idxs.append(d_word_idx[word])
+KeyboardInterrupt
