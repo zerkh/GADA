@@ -58,7 +58,7 @@ def read_sentence(path, d_word_idx, d_idx_word, maxlen=200):
 
 def get_sentence_len(sent):
 	index = 0
-	while sent[index] != 1 and index < len(sent):
+	while index < len(sent) and sent[index] != 1:
 		index += 1
 	
 	return index
@@ -94,8 +94,8 @@ def get_data(emb_path, source_dir, target_dir, maxlen):
 	num_slides_all = len(all_sent)/3
 	num_slides_senti = len(senti_sent)/3
 	for i in xrange(3):
-		p_all_sent = all_sent[i*num_slides_all,(i+1)*num_slides_all]
-		p_senti_sent = senti_sent[i*num_slides_senti,(i+1)*num_slides_senti]
+		p_all_sent = all_sent[i*num_slides_all:(i+1)*num_slides_all]
+		p_senti_sent = senti_sent[i*num_slides_senti:(i+1)*num_slides_senti]
 		
 		p_train_data = dict()
 		p_train_data["all"] = p_all_sent
@@ -107,13 +107,13 @@ def get_data(emb_path, source_dir, target_dir, maxlen):
 	test_pos_data = [(sent,0) for sent in tar_pos_sent[:min_len]]
 	test_neg_data = [(sent,1) for sent in tar_neg_sent[:min_len]]
 	
-	test_data = test_pos_data[:0.9*min_len]
-	test_data += test_neg_data[:0.9*min_len]
+	test_data = test_pos_data[:int(0.9*min_len)]
+	test_data += test_neg_data[:int(0.9*min_len)]
 	
-	dev_data = test_pos_data[0.9*min_len:]
-	dev_data += test_neg_data[0.9*min_len:]
+	dev_data = test_pos_data[int(0.9*min_len):]
+	dev_data += test_neg_data[int(0.9*min_len):]
 	
-	return train_data, dev_data, test_data
+	return train_data, dev_data, test_data, word_emb
 
 def get_batch(data, batch_size):
 	feat = list()
@@ -128,5 +128,7 @@ def get_batch(data, batch_size):
 	return feat, target
 
 if __name__ == "__main__":
-	d_word_idx, d_idx_word, l_wordvec = read_wordvec("/home/kh/amazon_review/experiment/wordvec/all_reviews.txt.dim25")
-	l_sentence = read_sentence("/home/kh/amazon_review/experiment/lem_data/apparel/all.review", d_word_idx, d_idx_word)
+	train_data, dev_data, test_data = get_data("/home/kh/amazon_review/experiment/wordvec/all_reviews.txt.dim50",
+						"/home/kh/amazon_review/experiment/lem_data/dvd/",
+						"/home/kh/amazon_review/experiment/lem_data/books", 300)
+
