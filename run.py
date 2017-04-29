@@ -77,19 +77,19 @@ def main(_):
 		print "Build model..."
 		start = clock()
 		with tf.variable_scope("model", reuse=None):
-			model = GADA(word_emb, FLAGS.num_units, FLAGS.batch_size, 
+			model = GADA(word_emb, True, FLAGS.num_units, FLAGS.batch_size, 
 					FLAGS.num_steps, FLAGS.num_proj,
 					FLAGS.learning_rate_g, FLAGS.learning_rate_d, FLAGS.learning_rate_c,
 					FLAGS.hidden_size_d, FLAGS.grad_clip)
 		
 		with tf.variable_scope("model", reuse=True):
-			dev_model = GADA(word_emb, FLAGS.num_units, 1, 
+			dev_model = GADA(word_emb, False, FLAGS.num_units, 1, 
 					FLAGS.num_steps, FLAGS.num_proj,
 					FLAGS.learning_rate_g, FLAGS.learning_rate_d, FLAGS.learning_rate_c,
 					FLAGS.hidden_size_d, FLAGS.grad_clip)
 		
 		with tf.variable_scope("model", reuse=True):
-			test_model = GADA(word_emb, FLAGS.num_units, 1, 
+			test_model = GADA(word_emb, False, FLAGS.num_units, 1, 
 					FLAGS.num_steps, FLAGS.num_proj,
 					FLAGS.learning_rate_g, FLAGS.learning_rate_d, FLAGS.learning_rate_c,
 					FLAGS.hidden_size_d, FLAGS.grad_clip)

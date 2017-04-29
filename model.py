@@ -3,7 +3,7 @@ import tensorflow as tf
 from reader import read_wordvec
 
 class GADA:
-	def __init__(self, word_emb, num_units=200, batch_size=32, num_steps=200, num_proj=64,
+	def __init__(self, word_emb, is_training=False, num_units=200, batch_size=32, num_steps=200, num_proj=64,
 				learning_rate_g=0.001, learning_rate_d=0.001, learning_rate_c=0.001,
 				hidden_size_d=200, grad_clip=5.0):
 		self.num_units = num_units
@@ -32,28 +32,29 @@ class GADA:
 
 		self.create_loss_terms()
 
-		# get variables
-		self.all_vars = tf.trainable_variables()
-
-		self.g_vars = [var for var in self.all_vars if (self.model_name+'_g_') in var.name]
-		self.d_vars = [var for var in self.all_vars if (self.model_name+'_d_') in var.name]
-		self.c_vars = [var for var in self.all_vars if (self.model_name+'_c_') in var.name]
-
-		self.gc_vars = self.g_vars+self.c_vars+[self.embedding]
-		self.g_vars += [self.embedding]
-
-		# get variables' grad
-		g_grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss_g, self.g_vars), self.grad_clip)
-		d_grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss_d, self.d_vars), self.grad_clip)
-		c_grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss_c, self.c_vars), self.grad_clip)
-
-		g_optimizer = tf.train.AdamOptimizer(self.learning_rate_g)
-		d_optimizer = tf.train.AdamOptimizer(self.learning_rate_d)
-		c_optimizer = tf.train.AdamOptimizer(self.learning_rate_c)
-
-		self.g_opt = g_optimizer.apply_gradients(zip(g_grads, self.g_vars))
-		self.d_opt = d_optimizer.apply_gradients(zip(d_grads, self.d_vars))
-		self.c_opt = c_optimizer.apply_gradients(zip(c_grads, self.c_vars))
+		if is_training:
+			# get variables
+			self.all_vars = tf.trainable_variables()
+	
+			self.g_vars = [var for var in self.all_vars if (self.model_name+'_g_') in var.name]
+			self.d_vars = [var for var in self.all_vars if (self.model_name+'_d_') in var.name]
+			self.c_vars = [var for var in self.all_vars if (self.model_name+'_c_') in var.name]
+	
+			self.gc_vars = self.g_vars+self.c_vars+[self.embedding]
+			self.g_vars += [self.embedding]
+	
+			# get variables' grad
+			g_grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss_g, self.g_vars), self.grad_clip)
+			d_grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss_d, self.d_vars), self.grad_clip)
+			c_grads,_ = tf.clip_by_global_norm(tf.gradients(self.loss_c, self.c_vars), self.grad_clip)
+	
+			g_optimizer = tf.train.AdamOptimizer(self.learning_rate_g)
+			d_optimizer = tf.train.AdamOptimizer(self.learning_rate_d)
+			c_optimizer = tf.train.AdamOptimizer(self.learning_rate_c)
+	
+			self.g_opt = g_optimizer.apply_gradients(zip(g_grads, self.g_vars))
+			self.d_opt = d_optimizer.apply_gradients(zip(d_grads, self.d_vars))
+			self.c_opt = c_optimizer.apply_gradients(zip(c_grads, self.c_vars))
 
 
 	def generator(self, reuse=False, attention=True):
