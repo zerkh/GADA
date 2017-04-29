@@ -33,7 +33,53 @@ class config:
     def __init__(self, idx):
         self.save_path = "./save/gada_att_%d" %(idx)
         self.log_path = "./log/config%d.log" %(idx)
-        self.emb_size = 
+        self.emb_size = random.choice(_EMB_SIZE)
+        self.souce_dir = "/home/kh/amazon_review/experiment/lem_data/dvd/"
+        self.target_dir = "/home/kh/amazon_review/experiment/lem_data/books"
+        self.num_units = random.choice(_NUM_UNITS)
+        
+        self.batch_size = random.choice(_BATCH_SIZE)
+        self.num_steps = self.max_len = random.choice(_NUM_STEPS)
+        self.num_proj = random.choice(_NUM_PROJ)
+        self.learning_rate_g = random.choice(_LEARNING_RATE_G)
+        self.learning_rate_d = random.choice(_LEARNING_RATE_D)
+        self.learning_rate_c = random.choice(_LEARNING_RATE_C)
+        self.hidden_size_d = random.choice(_HIDDEN_SIZE_D)
+        
+        self.command = "python run.py --save_path %s \
+                            --log_path %s\
+                            --emb_size %d\
+                            --source_dir %s\
+                            --target_dir %s\
+                            --num_units %d\
+                            --batch_size %d\
+                            --num_steps %d\
+                            --num_proj %d\
+                            --learning_rate_g %g\
+                            --learning_rate_d %g\
+                            --learning_rate_c %g\
+                            --hidden_size_d %d\
+                            --max_len %d > out%d &" %(self.save, self.log_path, self.emb_size, self.souce_dir, self.target_dir,
+                                            self.num_units, self.batch_size, self.num_steps, self.num_proj,
+                                            self.learning_rate_g, self.learning_rate_d, self.learning_rate_c,
+                                            self.hidden_size_d, self.max_len, idx)
         
 if __name__ == "__main__":
+    idx = 0
+    l_config = list()
+    l_config.append(config(idx))
+    idx += 1
     
+    while idx < 10:
+        c = config(idx)
+        flag = False
+        for t in l_config:
+            if t.command == c.command:
+                flag = True
+                break
+        if not flag:
+            l_config.append(c)
+            idx += 1
+            
+    for c in l_config:
+        os.system(c.command)
