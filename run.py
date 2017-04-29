@@ -7,7 +7,8 @@ from time import clock
 logging = tf.logging
 tf.flags.DEFINE_boolean("is_train", True, "is_train")
 tf.flags.DEFINE_string("save_path", "./save/gada-att", "save_path")
-tf.flags.DEFINE_string("emb_path", "/home/kh/amazon_review/experiment/wordvec/all_reviews.txt.dim25", "emb_path")
+tf.flags.DEFINE_string("log_path", "./log/config.log", "save_path")
+tf.flags.DEFINE_integer("emb_size", 25, "num_units")
 tf.flags.DEFINE_string("source_dir", None, "source_dir")
 tf.flags.DEFINE_string("target_dir", None, "target_dir")
 tf.flags.DEFINE_integer("num_units", 200, "num_units")
@@ -58,17 +59,21 @@ def test(sess, test_data, model=None):
 	true_num = 0
 	for term in test_data:
 		logits_c = sess.run(model.logits_c, feed_dict={model.x:[term[0]]})
-		pred_label = 0 if logits_c[0]>logits_c[1] else 1
+		pred_label = 0 if logits_c[0][0]>logits_c[0][1] else 1
 		if pred_label == term[1]:
 			true_num += 1
 	return true_num/float(len(test_data))
 	
 def main(_):
+	out = open(FLAGS.log_path, "w")
+	for key in FLAGS.__flags.keys():
+		out.write("%s : %s" %(key, FLAGS.__flags[key]))
 	with tf.Session() as sess:
 		# get data
 		print "Prepare data..."
 		start = clock()
-		train_data, dev_data, test_data, word_emb = get_data(FLAGS.emb_path, FLAGS.source_dir, 
+		emb_path = "/home/kh/amazon_review/experiment/wordvec/all_reviews.txt.dim%d" %(FLAGS.emb_size)
+		train_data, dev_data, test_data, word_emb = get_data(emb_path, FLAGS.source_dir, 
 											FLAGS.target_dir, FLAGS.maxlen)
 		end = clock()
 		print "Cost %g min" %((end-start)/60)	
@@ -111,6 +116,9 @@ def main(_):
 		end = clock()
 		print "Cost %g min" %((end-start)/60)
 		print "Test accuracy: %g" %(acc)
+		out.write(acc)
+	
+	out.close()
 
 if __name__ == "__main__":
 	tf.app.run()
