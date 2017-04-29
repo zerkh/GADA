@@ -20,7 +20,7 @@ tf.flags.DEFINE_float("learning_rate_c", 0.001, "learning_rate_c")
 tf.flags.DEFINE_integer("hidden_size_d", 200, "hidden_size_d")
 tf.flags.DEFINE_float("grad_clip", 5.0, "grad_clip")
 tf.flags.DEFINE_integer("maxlen", 200, "maxlen")
-tf.flags.DEFINE_integer("train_epochs", 2000, "train_epochs")
+tf.flags.DEFINE_integer("train_epochs", 1, "train_epochs")
 
 FLAGS = tf.flags.FLAGS
 
@@ -33,15 +33,15 @@ def partial_train(sess, model, dev_model, train_data, dev_data, word_emb):
 		for epoch in xrange(FLAGS.train_epochs):
 			# train discriminator
 			for i in xrange(5):
-				_x, _y = get_batch(train_data["all"], FLAGS.batch_size)
-				sess.run(model.d_opt, feed_dict={})
+				_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
+				sess.run(model.d_opt, feed_dict={model.x:_x, model.y_d:_y})
 			# train generator
-			_x, _y = get_batch(train_data["all"], FLAGS.batch_size)
-			sess.run(model.g_opt, feed_dict={})
+			_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
+			sess.run(model.g_opt, feed_dict={model.x:_x, model.y_d:_y})
 			# train classifier
 			for i in xrange(2):
-				_x, _y = get_batch(train_data["sentiment"], FLAGS.batch_size)
-				sess.run(model.c_opt, feed_dict={})
+				_x, _y = get_batch(train_data[slice]["sentiment"], FLAGS.batch_size)
+				sess.run(model.c_opt, feed_dict={model.x:_x, model.y_s:_y})
 				
 			if epoch%100:
 				acc = test(sess, dev_data, dev_model)
@@ -107,9 +107,10 @@ def main(_):
 
 		print "Testing..."
 		start = clock()
-		test(sess, test_model, test_data)
+		acc = test(sess, test_data, test_model)
 		end = clock()
 		print "Cost %g min" %((end-start)/60)
+		print "Test accuracy: %g" %(acc)
 
 if __name__ == "__main__":
 	tf.app.run()

@@ -115,6 +115,12 @@ def get_data(emb_path, source_dir, target_dir, maxlen):
 	
 	return train_data, dev_data, test_data, word_emb
 
+def one_hot(label):
+	vec = [0]*2
+	vec[label] = 1
+
+	return vec	
+
 def get_batch(data, batch_size):
 	feat = list()
 	target = list()
@@ -123,7 +129,7 @@ def get_batch(data, batch_size):
 	
 	for term in p_data:
 		feat.append(term[0])
-		target.append(term[1])
+		target.append(one_hot(term[1]))
 		
 	return feat, target
 
