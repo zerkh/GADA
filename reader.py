@@ -121,6 +121,16 @@ def one_hot(label):
 
 	return vec	
 
+def clip_data(data):
+	for p_data in data:
+		clip_all_len = int(0.01*len(p_data["all"]))
+		clip_sent_len = int(1*len(p_data["sentiment"]))
+
+		p_data["all"] = p_data["all"][:clip_all_len]
+		p_data["sentiment"] = p_data["sentiment"][:clip_sent_len]
+
+	return data
+
 def get_batch(data, batch_size):
 	feat = list()
 	target = list()

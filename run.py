@@ -1,10 +1,11 @@
 #coding=utf-8
 import tensorflow as tf
-from reader import get_data, get_batch
+from reader import get_data, get_batch, clip_data
 from model import GADA
 from time import clock
 
 logging = tf.logging
+tf.flags.DEFINE_boolean("is_small", False, "small dataset")
 tf.flags.DEFINE_boolean("is_train", True, "is_train")
 tf.flags.DEFINE_string("save_path", "./save/gada-att", "save_path")
 tf.flags.DEFINE_string("log_path", "./log/config.log", "save_path")
@@ -21,7 +22,7 @@ tf.flags.DEFINE_float("learning_rate_c", 0.001, "learning_rate_c")
 tf.flags.DEFINE_integer("hidden_size_d", 200, "hidden_size_d")
 tf.flags.DEFINE_float("grad_clip", 5.0, "grad_clip")
 tf.flags.DEFINE_integer("maxlen", 200, "maxlen")
-tf.flags.DEFINE_integer("train_epochs", 1, "train_epochs")
+tf.flags.DEFINE_integer("train_epochs", 10000, "train_epochs")
 
 FLAGS = tf.flags.FLAGS
 
@@ -33,18 +34,19 @@ def partial_train(sess, model, dev_model, train_data, dev_data, word_emb):
 		data = train_data[slice]
 		for epoch in xrange(FLAGS.train_epochs):
 			# train discriminator
-			for i in xrange(5):
+			for i in xrange(3):
 				_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
 				sess.run(model.d_opt, feed_dict={model.x:_x, model.y_d:_y})
 			# train generator
-			_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
-			sess.run(model.g_opt, feed_dict={model.x:_x, model.y_d:_y})
+			for i in xrange(1):
+				_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
+				sess.run(model.g_opt, feed_dict={model.x:_x, model.y_d:_y})
 			# train classifier
 			for i in xrange(2):
 				_x, _y = get_batch(train_data[slice]["sentiment"], FLAGS.batch_size)
 				sess.run(model.c_opt, feed_dict={model.x:_x, model.y_s:_y})
 				
-			if epoch%100 == 0:
+			if epoch%5000 == 0:
 				acc = test(sess, dev_data, dev_model)
 				print "slice %d epoch %d: %g" %(slice, epoch, acc)
 				
@@ -67,7 +69,7 @@ def test(sess, test_data, model=None):
 def main(_):
 	out = open(FLAGS.log_path, "w")
 	for key in FLAGS.__flags.keys():
-		out.write("%s : %s" %(key, FLAGS.__flags[key]))
+		out.write("%s : %s\n" %(key, FLAGS.__flags[key]))
 	with tf.Session() as sess:
 		# get data
 		print "Prepare data..."
@@ -75,6 +77,9 @@ def main(_):
 		emb_path = "/home/kh/amazon_review/experiment/wordvec/all_reviews.txt.dim%d" %(FLAGS.emb_size)
 		train_data, dev_data, test_data, word_emb = get_data(emb_path, FLAGS.source_dir, 
 											FLAGS.target_dir, FLAGS.maxlen)
+		if FLAGS.is_small:
+			train_data = clip_data(train_data)
+			print len(train_data[0]["sentiment"])
 		end = clock()
 		print "Cost %g min" %((end-start)/60)	
 
@@ -116,7 +121,7 @@ def main(_):
 		end = clock()
 		print "Cost %g min" %((end-start)/60)
 		print "Test accuracy: %g" %(acc)
-		out.write(acc)
+		out.write(str(acc))
 	
 	out.close()
 
