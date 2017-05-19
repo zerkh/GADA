@@ -107,12 +107,18 @@ def get_data(emb_path, source_dir, target_dir, maxlen):
 	test_pos_data = [(sent,0) for sent in tar_pos_sent[:min_len]]
 	test_neg_data = [(sent,1) for sent in tar_neg_sent[:min_len]]
 	
-	test_data = test_pos_data[:int(0.9*min_len)]
-	test_data += test_neg_data[:int(0.9*min_len)]
+	# test_data = test_pos_data[:int(0.9*min_len)]
+	# test_data += test_neg_data[:int(0.9*min_len)]
 	
-	dev_data = test_pos_data[int(0.9*min_len):]
-	dev_data += test_neg_data[int(0.9*min_len):]
+	# dev_data = test_pos_data[int(0.9*min_len):]
+	# dev_data += test_neg_data[int(0.9*min_len):]
 	
+	test_data = test_pos_data[:500]
+	test_data += test_neg_data[:500]
+
+	dev_data = test_pos_data[500:600]
+	dev_data += test_neg_data[500:600]
+
 	return train_data, dev_data, test_data, word_emb
 
 def one_hot(label):

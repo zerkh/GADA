@@ -3,15 +3,16 @@ import os
 import random
 import sys
 
-_EMB_SIZE = [25,50,75]
-_NUM_UNITS = [50,75,100,200]
-_BATCH_SIZE = [16,32]
-_NUM_STEPS = [100,200]
-_NUM_PROJ = [50,64,75,100,200,300]
-_LEARNING_RATE_G = [0.001,0.0001,0.00001,0.000001,0.00000001]
-_LEARNING_RATE_D = [0.001,0.0001,0.00001,0.000001,0.00000001]
-_LEARNING_RATE_C = [0.001,0.0001,0.00001,0.000001,0.00000001]
-_HIDDEN_SIZE_D = [50,75,100,200,300,400]
+_EMB_SIZE = [25,50,75,100]
+_NUM_UNITS = [200]
+_BATCH_SIZE = [32]
+_NUM_STEPS = [200]
+_NUM_PROJ = [200]
+_LEARNING_RATE_G = [0.000001]
+_LEARNING_RATE_D = [0.000001]
+_LEARNING_RATE_C = [0.000001]
+_HIDDEN_SIZE_D = [300]
+_GRAD_CLIP = [10.0]
 
 class config:
     def __init__(self, idx):
@@ -29,7 +30,8 @@ class config:
         self.learning_rate_d = random.choice(_LEARNING_RATE_D)
         self.learning_rate_c = random.choice(_LEARNING_RATE_C)
         self.hidden_size_d = random.choice(_HIDDEN_SIZE_D)
-	self.train_spochs = 200        
+	self.train_spochs = 10000
+	self.grad_clip = random.choice(_GRAD_CLIP)       
 
         self.command = "python run.py --save_path %s \
                             --log_path %s\
@@ -50,7 +52,24 @@ class config:
                                             self.num_units, self.batch_size, self.num_steps, self.num_proj,
                                             self.learning_rate_g, self.learning_rate_d, self.learning_rate_c,
                                             self.hidden_size_d, self.is_small, self.train_spochs, self.maxlen, idx, idx)
-        
+	self.uid = "--emb_size %d\
+                            --source_dir %s\
+                            --target_dir %s\
+                            --num_units %d\
+                            --batch_size %d\
+                            --num_steps %d\
+                            --num_proj %d\
+                            --learning_rate_g %g\
+                            --learning_rate_d %g\
+                            --learning_rate_c %g\
+                            --hidden_size_d %d\
+                            --is_small %s\
+                            --train_epochs %d\
+                            --maxlen %d" %(self.emb_size, self.souce_dir, self.target_dir,
+                                            self.num_units, self.batch_size, self.num_steps, self.num_proj,
+                                            self.learning_rate_g, self.learning_rate_d, self.learning_rate_c,
+                                            self.hidden_size_d, self.is_small, self.train_spochs, self.maxlen)       
+
 if __name__ == "__main__":
     idx = 0
     l_config = list()
@@ -64,7 +83,7 @@ if __name__ == "__main__":
         c = config(idx)
         flag = False
         for t in l_config:
-            if t.command == c.command:
+            if t.uid == c.uid:
                 flag = True
                 break
         if not flag:

@@ -1,2 +1,2 @@
-model_checkpoint_path: "gada-att"
-all_model_checkpoint_paths: "gada-att"
+model_checkpoint_path: "gada_att_0"
+all_model_checkpoint_paths: "gada_att_0"

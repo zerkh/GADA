@@ -1,0 +1,15 @@
+Prepare data...
+Cost 0.887848 min
+Build model...
+Cost 3.09595 min
+Training...
+slice 0 epoch 0: 0.5
+slice 0 epoch 5000: 0.738351
+slice 1 epoch 0: 0.727599
+slice 1 epoch 5000: 0.761649
+slice 2 epoch 0: 0.702509
+slice 2 epoch 5000: 0.741935
+Cost 10051.5 min
+Testing...
+Cost 12.0851 min
+Test accuracy: 0.778907

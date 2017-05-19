@@ -29,12 +29,13 @@ FLAGS = tf.flags.FLAGS
 def partial_train(sess, model, dev_model, train_data, dev_data, word_emb):
 	#Saver
 	saver = tf.train.Saver(tf.trainable_variables())
+	acc = 0.0
 	
 	for slice in xrange(len(train_data)):
 		data = train_data[slice]
 		for epoch in xrange(FLAGS.train_epochs):
 			# train discriminator
-			for i in xrange(3):
+			for i in xrange(5):
 				_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
 				sess.run(model.d_opt, feed_dict={model.x:_x, model.y_d:_y})
 			# train generator
@@ -42,12 +43,15 @@ def partial_train(sess, model, dev_model, train_data, dev_data, word_emb):
 				_x, _y = get_batch(train_data[slice]["all"], FLAGS.batch_size)
 				sess.run(model.g_opt, feed_dict={model.x:_x, model.y_d:_y})
 			# train classifier
-			for i in xrange(2):
+			for i in xrange(5):
 				_x, _y = get_batch(train_data[slice]["sentiment"], FLAGS.batch_size)
 				sess.run(model.c_opt, feed_dict={model.x:_x, model.y_s:_y})
 				
-			if epoch%5000 == 0:
-				acc = test(sess, dev_data, dev_model)
+			if epoch%500 == 0:
+				t_acc = test(sess, dev_data, dev_model)
+				if t_acc <= acc:
+					break
+				acc = t_acc
 				print "slice %d epoch %d: %g" %(slice, epoch, acc)
 				
 			if epoch%1000 == 0:
@@ -79,7 +83,6 @@ def main(_):
 											FLAGS.target_dir, FLAGS.maxlen)
 		if FLAGS.is_small:
 			train_data = clip_data(train_data)
-			print len(train_data[0]["sentiment"])
 		end = clock()
 		print "Cost %g min" %((end-start)/60)	
 

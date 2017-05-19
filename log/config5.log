@@ -1,0 +1,18 @@
+grad_clip : 5.0
+num_proj : 300
+train_epochs : 10000
+hidden_size_d : 200
+save_path : ./save/gada_att_5
+log_path : ./log/config5.log
+target_dir : /home/kh/amazon_review/experiment/lem_data/books
+num_steps : 100
+batch_size : 16
+emb_size : 50
+maxlen : 100
+learning_rate_c : 0.0001
+num_units : 50
+learning_rate_g : 0.001
+is_train : True
+source_dir : /home/kh/amazon_review/experiment/lem_data/dvd/
+learning_rate_d : 0.0001
+0.5
